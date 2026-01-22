@@ -23,7 +23,7 @@ CELL_SIZE <- 0.6096   # meters
 RAS_RESULTS_DIR <- "Y:/Shared/Active_Projects/114-01_Kuhlanapo_Preserve/Modeling/01_Kuulanapo_RASv66"
 
 # Input CSV
-PLANS_CSV <- here("data-raw", "plans-long.csv")
+PLANS_CSV <- here("data", "plans-long.csv")
 
 # Output COG directory
 OUT_COG_DIR <- here("data", "cog")

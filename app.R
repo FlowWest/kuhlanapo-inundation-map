@@ -9,7 +9,7 @@ library(dplyr)
 library(shinycssloaders)
 
 # -------- CONFIG --------
-COG_URL_TEMPLATE <- "https://raw.githubusercontent.com/FlowWest/kuhlanapo-inundation-map/main/cog-data/min_flow_inundation_{alt}_lake_{lake}.tif"
+COG_URL_TEMPLATE <- "https://raw.githubusercontent.com/FlowWest/kuhlanapo-inundation-map/main/data/cog/min_flow_inundation_{alt}_lake_{lake}.tif"
 local_cache_dir <- "data_cache"
 dir.create(local_cache_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -38,7 +38,7 @@ open_cog <- function(alt, lake, return_path = TRUE) {
 }
 
 # -------- discover alternatives --------
-plans_csv <- "data-raw/plans-long.csv"
+plans_csv <- "data/plans-long.csv"
 if (!file.exists(plans_csv)) stop("plans-long.csv missing")
 plans_df <- read.csv(plans_csv, stringsAsFactors = FALSE)
 alternatives <- unique(plans_df$alternative)
