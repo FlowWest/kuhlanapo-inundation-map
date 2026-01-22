@@ -1,0 +1,4 @@
+alternative,lake_level,plan_name,plan_id,flow_cfs,result_dts,rast_path
+baseline,90EP,Baseline_50_100_200_90EPLake_20260121,p04,50,2000-01-01 10:00,
+baseline,90EP,Baseline_50_100_200_90EPLake_20260121,p04,100,2000-01-01 14:00,
+baseline,90EP,Baseline_50_100_200_90EPLake_20260121,p04,200,2000-01-01 18:00,
