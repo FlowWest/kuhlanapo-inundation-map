@@ -1,0 +1,19 @@
+.leaflet-container {
+  background: #ffffff;
+}
+
+.leaflet-pane.leaflet-basemap-overlay-pane {
+  mix-blend-mode: multiply;
+}
+
+.leaflet-pane.leaflet-basemap-mono-pane {
+  filter: grayscale(50%);
+}
+
+.leaflet-pane.leaflet-inundation-pane {
+  mix-blend-mode: multiply;
+}
+
+.leaflet-pane.leaflet-inundation-pane img {
+  image-rendering: auto;
+}

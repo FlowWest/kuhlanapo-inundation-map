@@ -52,6 +52,7 @@ gages_sf    <- if (file.exists(gages_geo)) st_read(gages_geo, quiet = TRUE) else
 
 # -------- UI --------
 ui <- fluidPage(
+  tags$link(rel = "stylesheet", href = "leaflet.css"),
   sidebarLayout(
     sidebarPanel(
       width = 3,  # narrow sidebar
@@ -92,15 +93,54 @@ server <- function(input, output, session) {
       z <- 12
     } else { lng <- 0; lat <- 0; z <- 2 }
     
+    aerial_plus_topo <- leaflet() |> 
+      leaflet::addProviderTiles(
+        providers$Esri.WorldImagery,
+        options = providerTileOptions(pane = "basemap-mono", opacity = 0.5, minZoom = 3, maxZoom = 18)
+      ) |>
+      leaflet::addProviderTiles(
+        providers$Esri.WorldTopo,
+        options = providerTileOptions(pane = "basemap-overlay", opacity = 1.0, minZoom = 3, maxZoom = 18)
+      )
+    
     m <- leaflet() |>
-      addProviderTiles(providers$Esri.WorldImagery, group="ESRI Imagery") |>
-      addLayersControl(baseGroups="ESRI Imagery",
-                       overlayGroups=c("Project Boundary","Creeks","Streamgages"),
+      addMapPane("basemap",    zIndex = 200) |>
+      addMapPane("basemap-mono",    zIndex = 200) |>
+      addMapPane("basemap-overlay",    zIndex = 200) |>
+      addMapPane("inundation", zIndex = 410) |>
+      addMapPane("polygons",   zIndex = 420) |>
+      addMapPane("lines",      zIndex = 430) |>
+      addMapPane("points",     zIndex = 440)  |>
+      addProviderTiles(
+        providers$Esri.WorldImagery,
+        group = "Imagery Only",
+        options = providerTileOptions(pane = "basemap", opacity = 0.8, minZoom = 3, maxZoom = 18)
+      ) |>
+      addProviderTiles(
+        providers$Esri.WorldTopo,
+        group = "Topo Only",
+        options = providerTileOptions(pane = "basemap", opacity = 1.0, minZoom = 3, maxZoom = 18)
+      ) |>
+      addProviderTiles(
+        providers$Esri.WorldImagery,
+        group = "Imagery + Topo",
+        options = providerTileOptions(pane = "basemap-mono", opacity = 0.5, minZoom = 3, maxZoom = 18)
+      ) |>
+      addProviderTiles(
+        providers$Esri.WorldTopo,
+        group = "Imagery + Topo",
+        options = providerTileOptions(pane = "basemap-overlay", opacity = 1.0, minZoom = 3, maxZoom = 18)
+      )|>
+    addLayersControl(baseGroups=c("Imagery Only", "Imagery + Topo", "Topo Only"),
+                       overlayGroups=c("Esri Topographic Labels", "Project Boundary","Creeks","Streamgages"),
                        options=layersControlOptions(collapsed=FALSE))
     
-    if (!is.null(boundary_sf)) m <- m |> addPolygons(data=boundary_sf, group="Project Boundary", fill=FALSE, color="yellow", weight=2)
-    if (!is.null(creeks_sf)) m <- m |> addPolylines(data=creeks_sf, group="Creeks", color="cyan", weight=2)
-    if (!is.null(gages_sf)) m <- m |> addCircleMarkers(data=gages_sf, group="Streamgages", radius=4, color="red")
+    if (!is.null(boundary_sf)) m <- m |> addPolygons(data=boundary_sf, group="Project Boundary", fill=FALSE, color="#ffc600", weight=2, opacity=1, 
+                                                     options=pathOptions(pane="polygons", dashArray = "5,5"))
+    if (!is.null(creeks_sf)) m <- m |> addPolylines(data=creeks_sf, group="Creeks", color="#00c6ff", weight=2, opacity=1,
+                                                    options=pathOptions(pane="lines", dashArray = "6,4"))
+    if (!is.null(gages_sf)) m <- m |> addCircleMarkers(data=gages_sf, group="Streamgages", radius=4, color="#8B0000", opacity=1,
+                                                       options=markerOptions(pane="points"))
     
     return(m)
   })
@@ -122,7 +162,7 @@ server <- function(input, output, session) {
     req(r)
     
     # Aggregate once to reasonable resolution 
-    r_agg <- aggregate(rast(r), fact = 3, fun = "min")
+    r_agg <- aggregate(rast(r), fact = 2, fun = "min")
     
     prepped_raster(r_agg)
     
@@ -139,7 +179,7 @@ server <- function(input, output, session) {
     req(prepped_raster())
     
     flow_val <- as.numeric(input$flow)
-    colors_fn <- function(x) ifelse(x <= flow_val, "#0000ff", NA)
+    colors_fn <- function(x) ifelse(x <= flow_val, "#0088ff", NA)
     
     proxy <- leafletProxy("map")
     
@@ -148,7 +188,8 @@ server <- function(input, output, session) {
     
     # add new raster with current flow
     new_group <- paste0("Inundation_", as.integer(Sys.time()))
-    proxy |> addRasterImage(prepped_raster(), colors = colors_fn, opacity = 1, group = new_group, project = FALSE)
+    proxy |> addRasterImage(prepped_raster(), colors = colors_fn, opacity = 1, group = new_group, project = FALSE,
+                            options = gridOptions(pane = "inundation"))
     
     last_group$name <- new_group
   })

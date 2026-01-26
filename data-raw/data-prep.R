@@ -81,7 +81,7 @@ if (file.exists(AOI_SHP)) {
 }
 
 
-read_sf(here("data-raw", "historic_stream_lines.shp.zip")) |> 
+read_sf(here("data-raw", "Manning_Creek_Centerline_20260102.shp.zip")) |> 
   st_transform("EPSG:4326") |> 
   st_write(here("data","stream_lines.geojson"), delete_dsn = TRUE, quiet = TRUE)
 
