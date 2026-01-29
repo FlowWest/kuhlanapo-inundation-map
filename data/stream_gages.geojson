@@ -3,8 +3,8 @@
 "name": "stream_gages",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
-{ "type": "Feature", "properties": { "Match_addr": "x: -122.909177 y: 39.022650", "Addr_type": "LatLong Point", "Status": "M", "Score": 100.0, "name": "2025sgmc01" }, "geometry": { "type": "Point", "coordinates": [ -122.909177000799076, 39.022649999412003 ] } },
-{ "type": "Feature", "properties": { "Match_addr": "x: -122.906869 y: 39.019994", "Addr_type": "LatLong Point", "Status": "M", "Score": 100.0, "name": "2025sgmc02" }, "geometry": { "type": "Point", "coordinates": [ -122.906869000654666, 39.019993999132225 ] } },
-{ "type": "Feature", "properties": { "Match_addr": "x: -122.907303 y: 39.018831", "Addr_type": "LatLong Point", "Status": "M", "Score": 100.0, "name": "2025sgmc03" }, "geometry": { "type": "Point", "coordinates": [ -122.907303000597679, 39.018830998722109 ] } }
+{ "type": "Feature", "properties": { "name": "2025SGMC01", "label": "Manning Creek West Branch" }, "geometry": { "type": "Point", "coordinates": [ -122.909177000799076, 39.022649999412003 ] } },
+{ "type": "Feature", "properties": { "name": "2025SGMC02", "label": "Secondary Channel" }, "geometry": { "type": "Point", "coordinates": [ -122.906869000654666, 39.019993999132225 ] } },
+{ "type": "Feature", "properties": { "name": "2025SGMC03", "label": "Manning Creek Mainstem" }, "geometry": { "type": "Point", "coordinates": [ -122.907303000597679, 39.018830998722109 ] } }
 ]
 }

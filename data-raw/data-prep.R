@@ -80,13 +80,18 @@ if (file.exists(AOI_SHP)) {
   message("AOI shapefile not present; cropping will use raster extents instead.")
 }
 
-
-read_sf(here("data-raw", "Manning_Creek_Centerline_20260102.shp.zip")) |> 
+read_sf(here("data-raw", "Manning_Creek_Centerline_20260128.shp.zip")) |> 
   st_transform("EPSG:4326") |> 
+  transmute(geometry, name = Label) |>
   st_write(here("data","stream_lines.geojson"), delete_dsn = TRUE, quiet = TRUE)
 
 read_sf(here("data-raw", "stage_gage_locations_approx.shp.zip")) |> 
   st_transform("EPSG:4326") |> 
+  transmute(geometry,
+            name = str_to_upper(name),
+            label = case_when(name == "2025SGMC01" ~ "Manning Creek West Branch",
+                              name == "2025SGMC02" ~ "Secondary Channel",
+                              name == "2025SGMC03" ~ "Manning Creek Mainstem")) |>
   st_write(here("data","stream_gages.geojson"), delete_dsn = TRUE, quiet = TRUE)
 
 
