@@ -53,14 +53,17 @@ gages_sf    <- if (file.exists(gages_geo)) st_read(gages_geo, quiet = TRUE) else
 # -------- UI --------
 ui <- fluidPage(
   tags$link(rel = "stylesheet", href = "leaflet.css"),
+  titlePanel("Kuhlanapo Modeled Inundation (under development)"),
   sidebarLayout(
     sidebarPanel(
+      class = "fixed-sidebar",  
       width = 3,  # narrow sidebar
       radioButtons("alternative", "Alternative", choices = alternatives, selected = alternatives[1]),
       radioButtons("lake_level", "Lake Level", choices = lake_levels, selected = lake_levels[1]),
       radioButtons("flow", "Flow (cfs)", choices = flows, selected = flows[1])
     ),
     mainPanel(
+      class = "main-map",
       width = 9,  # remaining space for the map
       withSpinner(
         leafletOutput("map", height = "100vh"),
@@ -132,7 +135,7 @@ server <- function(input, output, session) {
         options = providerTileOptions(pane = "basemap-overlay", opacity = 1.0, minZoom = 3, maxZoom = 18)
       )|>
     addLayersControl(baseGroups=c("Imagery Only", "Imagery + Topo", "Topo Only"),
-                       overlayGroups=c("Esri Topographic Labels", "Project Boundary","Creeks","Streamgages"),
+                       overlayGroups=c("Project Boundary","Creeks","Streamgages"),
                        options=layersControlOptions(collapsed=FALSE))
     
     if (!is.null(boundary_sf)) m <- m |> addPolygons(data=boundary_sf, group="Project Boundary", fill=FALSE, color="#ffc600", weight=2, opacity=1, 

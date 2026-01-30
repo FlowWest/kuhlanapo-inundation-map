@@ -17,3 +17,24 @@
 .leaflet-pane.leaflet-inundation-pane img {
   image-rendering: auto;
 }
+
+form.well {
+  background: none !important;
+  border: none !important;
+}
+
+.main-map[role="main"] {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+@media (max-width: 768px) {
+  .fixed-sidebar {
+    width: 100% !important; 
+  }
+}
+
+.h2 {
+  font-size: 1.6rem !important;
+  font-weight: bold;
+}
