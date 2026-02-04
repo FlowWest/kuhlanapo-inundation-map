@@ -7,6 +7,7 @@ library(htmlwidgets)
 library(glue)
 library(dplyr)
 library(shinycssloaders)
+library(stringr)
 
 # -------- CONFIG --------
 COG_URL_TEMPLATE <- "https://raw.githubusercontent.com/FlowWest/kuhlanapo-inundation-map/main/data/cog/min_flow_inundation_{alt}_lake_{lake}.tif"
@@ -66,14 +67,17 @@ lake_level_meta <- lake_level_meta |>
 # -------- UI --------
 ui <- fluidPage(
   tags$link(rel = "stylesheet", href = "leaflet.css"),
-  titlePanel("Kuhlanapo Modeled Inundation (under development)"),
   sidebarLayout(
     sidebarPanel(
       class = "fixed-sidebar",  
       width = 3,  # narrow sidebar
-      radioButtons("alternative", "Alternative", choices = alternatives, selected = alternatives[1]),
-      radioButtons("lake_level", "Lake Level", choices = setNames(lake_level_meta$id, lake_level_meta$label), selected = lake_levels[1]),
-      radioButtons("flow", "Flow (cfs)", choices = flows, selected = 80)
+      titlePanel("Kuhlanapo Wetland Restoration"),
+      tags$fieldset(
+        tags$legend("Modeled Inundation"),
+        radioButtons("alternative", "Alternative", choices = alternatives, selected = alternatives[1]),
+        radioButtons("lake_level", "Lake Level", choices = setNames(lake_level_meta$id, lake_level_meta$label), selected = lake_levels[1]),
+        radioButtons("flow", "Flow (cfs)", choices = flows, selected = 80)
+      )
     ),
     mainPanel(
       class = "main-map",
@@ -191,7 +195,7 @@ server <- function(input, output, session) {
   # -------------------------
   # UPDATE RASTER FOR FLOW CHANGES
   # -------------------------
-  observeEvent(input$flow, {
+  observeEvent(list(input$flow, prepped_raster()), {
     req(prepped_raster())
     
     flow_val <- as.numeric(input$flow)
