@@ -18,6 +18,13 @@ boundary_geo  <- "data/project_boundary.geojson"
 creeks_geo    <- "data/stream_lines.geojson"
 gages_geo     <- "data/stream_gages.geojson"
 
+# lake level attributes
+lake_level_meta <- tribble(~id    , ~name    , ~ft_navd88
+                         , "90EP" , "90% EP" , 1321.7
+                         , "50EP" , "Median" , 1324.4
+                         , "Full" , "Full"   , 1320.74 + 7.56
+                         ) 
+
 # -------- helpers --------
 open_cog <- function(alt, lake, return_path = TRUE) {
   local_path <- here::here("data/cog", paste0("min_flow_inundation_", alt, "_lake_", lake, ".tif"))
@@ -50,6 +57,12 @@ boundary_sf <- if (file.exists(boundary_geo)) st_read(boundary_geo, quiet = TRUE
 creeks_sf   <- if (file.exists(creeks_geo)) st_read(creeks_geo, quiet = TRUE) else NULL
 gages_sf    <- if (file.exists(gages_geo)) st_read(gages_geo, quiet = TRUE) else NULL
 
+# clean up lake level meta
+lake_level_meta <- lake_level_meta |>
+  mutate(ft_rumsey = ft_navd88 - 1320.74,
+         label = str_glue("{sprintf('%.1f', ft_rumsey)} ft ({name})")) |>
+  filter(id %in% lake_levels)
+
 # -------- UI --------
 ui <- fluidPage(
   tags$link(rel = "stylesheet", href = "leaflet.css"),
@@ -59,8 +72,8 @@ ui <- fluidPage(
       class = "fixed-sidebar",  
       width = 3,  # narrow sidebar
       radioButtons("alternative", "Alternative", choices = alternatives, selected = alternatives[1]),
-      radioButtons("lake_level", "Lake Level", choices = lake_levels, selected = lake_levels[1]),
-      radioButtons("flow", "Flow (cfs)", choices = flows, selected = flows[1])
+      radioButtons("lake_level", "Lake Level", choices = setNames(lake_level_meta$id, lake_level_meta$label), selected = lake_levels[1]),
+      radioButtons("flow", "Flow (cfs)", choices = flows, selected = 80)
     ),
     mainPanel(
       class = "main-map",
