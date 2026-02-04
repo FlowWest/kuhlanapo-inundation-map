@@ -12,6 +12,7 @@ library(stringr)
 library(purrr)
 library(glue)
 library(here)
+library(lubridate)
 
 # ---------------- CONFIG ----------------
 
@@ -41,6 +42,7 @@ plans <- read_csv(PLANS_CSV, show_col_types = FALSE) |>
     alternative = as.character(alternative),
     lake_level = as.character(lake_level),
     flow_cfs = as.numeric(flow_cfs),
+    result_dts = mdy_hm(result_dts)
   )
 
 # Validate required columns
@@ -124,10 +126,11 @@ resolve_rast_path <- function(row) {
   if (!is.null(row$rast_path) && nzchar(row$rast_path) && file.exists(row$rast_path)) return(row$rast_path)
   if (!is.null(row$result_dts) && nzchar(row$result_dts)) {
     candidate <- file.path(RAS_RESULTS_DIR, row$plan_name, build_wse_name_from_dts(row$result_dts))
+    message("looking for", candidate)
     if (file.exists(candidate)) return(candidate)
   }
-  discovered <- find_wse_in_plan_folder(row$plan_name, row$flow_cfs)
-  if (!is.null(discovered)) return(discovered)
+  #discovered <- find_wse_in_plan_folder(row$plan_name, row$flow_cfs)
+  #if (!is.null(discovered)) return(discovered)
   return(NA_character_)
 }
 
@@ -154,6 +157,7 @@ plans <- plans |>
 
 for (i in seq_len(nrow(plans))) {
   plans$rast_path[i] <- resolve_rast_path(plans[i, , drop = FALSE])
+  message(plans$rast_path[i])
   plans$rast_resolved[i] <- !is.na(plans$rast_path[i])
   if (!plans$rast_resolved[i]) {
     warning("Could not resolve WSE raster for row ", i,

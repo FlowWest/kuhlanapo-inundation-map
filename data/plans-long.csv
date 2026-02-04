@@ -1,4 +1,21 @@
 alternative,lake_level,plan_name,plan_id,flow_cfs,result_dts,rast_path
-baseline,90EP,Baseline_50_100_200_90EPLake_20260121,p04,50,2000-01-01 10:00,
-baseline,90EP,Baseline_50_100_200_90EPLake_20260121,p04,100,2000-01-01 14:00,
-baseline,90EP,Baseline_50_100_200_90EPLake_20260121,p04,200,2000-01-01 18:00,
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,5,1/1/2000 1:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (01JAN2000 01 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,10,1/1/2000 6:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (01JAN2000 06 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,20,1/1/2000 10:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (01JAN2000 10 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,40,1/1/2000 14:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (01JAN2000 14 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,80,1/1/2000 18:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (01JAN2000 18 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,160,1/1/2000 22:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (01JAN2000 22 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,320,1/2/2000 2:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (02JAN2000 02 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,640,1/2/2000 6:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (02JAN2000 06 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,1280,1/2/2000 10:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (02JAN2000 10 00 00).vrt
+baseline,90EP,Baseline_DoublingStep_90EPLake_20260203,p05,2560,1/2/2000 18:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_90EPLake_20260203\WSE (02JAN2000 18 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,5,1/1/2000 1:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (01JAN2000 01 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,10,1/1/2000 6:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (01JAN2000 06 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,20,1/1/2000 10:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (01JAN2000 10 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,40,1/1/2000 14:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (01JAN2000 14 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,80,1/1/2000 18:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (01JAN2000 18 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,160,1/1/2000 22:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (01JAN2000 22 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,320,1/2/2000 2:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (02JAN2000 02 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,640,1/2/2000 6:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (02JAN2000 06 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,1280,1/2/2000 10:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (02JAN2000 10 00 00).vrt
+baseline,50EP,Baseline_DoublingStep_50EPLake_20260203,p06,2560,1/2/2000 18:00,Y:\Shared\Active_Projects\114-01_Kuhlanapo_Preserve\Modeling\01_Kuulanapo_RASv66\Baseline_DoublingStep_50EPLake_20260203\WSE (02JAN2000 18 00 00).vrt
