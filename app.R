@@ -66,6 +66,7 @@ lake_level_meta <- lake_level_meta |>
 
 # -------- UI --------
 ui <- fluidPage(
+  shinyjs::useShinyjs(),
   tags$link(rel = "stylesheet", href = "leaflet.css"),
   sidebarLayout(
     sidebarPanel(
@@ -76,7 +77,8 @@ ui <- fluidPage(
         tags$legend("Modeled Inundation"),
         radioButtons("alternative", "Alternative", choices = alternatives, selected = alternatives[1]),
         radioButtons("lake_level", "Lake Level", choices = setNames(lake_level_meta$id, lake_level_meta$label), selected = lake_levels[1]),
-        radioButtons("flow", "Flow (cfs)", choices = flows, selected = 80)
+        radioButtons("flow", "Flow (cfs)", choices = flows, selected = 80),
+        checkboxInput("show_all", "Overlay All Flows", value = FALSE)
       )
     ),
     mainPanel(
@@ -88,13 +90,22 @@ ui <- fluidPage(
         color = "#0073B7",
         size = 2
       )
-    )
+    ) 
   )
 )
 
 
 # -------- SERVER --------
 server <- function(input, output, session) {
+  
+  # Observe the state of the "disable_checkbox" input
+  observeEvent(input$show_all, {
+    if (input$show_all == TRUE) {
+      shinyjs::disable("flow")
+    } else {
+      shinyjs::enable("flow") 
+    }
+  })
   
   # reactiveValues to track last raster group
   last_group <- reactiveValues(name = NULL)
@@ -105,6 +116,13 @@ server <- function(input, output, session) {
   # -------------------------
   # INITIALIZE MAP
   # -------------------------
+  
+  add_layers_control <- function(m) {
+    m |> addLayersControl(baseGroups=c("Imagery Only", "Imagery + Topo", "Topo Only"),
+                          overlayGroups=c("Project Boundary","Creeks","Streamgages"),
+                          options=layersControlOptions(collapsed=FALSE))
+  }
+  
   output$map <- renderLeaflet({
     if (!is.null(boundary_sf)) {
       bbox <- st_bbox(boundary_sf)
@@ -150,10 +168,7 @@ server <- function(input, output, session) {
         providers$Esri.WorldTopo,
         group = "Imagery + Topo",
         options = providerTileOptions(pane = "basemap-overlay", opacity = 1.0, minZoom = 3, maxZoom = 18)
-      )|>
-    addLayersControl(baseGroups=c("Imagery Only", "Imagery + Topo", "Topo Only"),
-                       overlayGroups=c("Project Boundary","Creeks","Streamgages"),
-                       options=layersControlOptions(collapsed=FALSE))
+      )|> add_layers_control()
     
     if (!is.null(boundary_sf)) m <- m |> addPolygons(data=boundary_sf, group="Project Boundary", fill=FALSE, color="#ffc600", weight=2, opacity=1, 
                                                      options=pathOptions(pane="polygons", dashArray = "5,5"))
@@ -195,25 +210,73 @@ server <- function(input, output, session) {
   # -------------------------
   # UPDATE RASTER FOR FLOW CHANGES
   # -------------------------
-  observeEvent(list(input$flow, prepped_raster()), {
+  observeEvent(list(input$flow, input$show_all, prepped_raster()), {
     req(prepped_raster())
-    
-    flow_val <- as.numeric(input$flow)
-    colors_fn <- function(x) ifelse(x <= flow_val, "#0088ff", NA)
     
     proxy <- leafletProxy("map")
     
     # remove old raster
     if (!is.null(last_group$name)) proxy |> clearGroup(last_group$name)
     
-    # add new raster with current flow
-    new_group <- paste0("Inundation_", as.integer(Sys.time()))
-    proxy |> addRasterImage(prepped_raster(), colors = colors_fn, opacity = 1, group = new_group, project = FALSE,
-                            options = gridOptions(pane = "inundation"))
+    r <- prepped_raster()
     
-    last_group$name <- new_group
-  })
-  
+    if (isTRUE(input$show_all)) {
+      # Continuous log-scaled viridis ramp
+      # compute min/max safely (avoid <= 0 values)
+      stats <- terra::global(r, fun = c("min", "max"), na.rm = TRUE)
+      minv <- stats[1, 1]
+      maxv <- stats[1, 2]
+      
+      # guard against non-positive mins
+      eps <- 1e-6
+      minv2 <- ifelse(is.na(minv) || minv <= 0, eps, minv)
+      maxv2 <- ifelse(is.na(maxv) || maxv <= minv2, minv2 * 10, maxv)
+      
+      # palette and color function: feed log10(x) into palette
+      pal_log <- viridisLite::viridis(256)
+      pal_fn <- colorNumeric(pal_log, domain = log10(c(minv2, maxv2)), na.color = NA)
+      
+      colors_fn <- function(x) {
+        # x may be matrix/array — apply vectorized
+        xvec <- as.numeric(x)
+        xvec[is.na(xvec)] <- NA
+        xvec_pos <- pmax(xvec, eps)
+        cols <- rep(NA_character_, length(xvec_pos))
+        valid <- !is.na(xvec)
+        cols[valid] <- pal_fn(log10(xvec_pos[valid]))
+        # return same shape as input
+        dim(cols) <- dim(x)
+        cols
+      }
+      
+      # add raster with continuous colors
+      new_group <- paste0("Inundation_all_", as.integer(Sys.time()))
+      proxy |> addRasterImage(r, colors = colors_fn, opacity = 1, group = new_group, project = FALSE, options = gridOptions(pane = "inundation"))
+      last_group$name <- new_group
+      
+      # build simple legend values (log-spaced, shown as original values)
+      leg_vals <- signif(10^seq(log10(minv2), log10(maxv2), length.out = 5), digits = 3)
+      leg_colors <- pal_fn(log10(leg_vals))
+      
+      # re-add controls (clearControls removes all controls including layers control)
+      proxy |> clearControls() |> add_layers_control() |>
+        addLegend(position = "bottomright", colors = leg_colors, labels = as.character(leg_vals), title = "Value (cfs)", opacity = 1)
+      
+    } else {
+      
+      # Thresholded rendering (original behavior)
+      req(input$flow)
+      flow_val <- as.numeric(input$flow)  # sliderTextInput returns strings, numeric conversion is fine
+      colors_fn <- function(x) ifelse(x <= flow_val, "#0088ff", NA)
+      
+      new_group <- paste0("Inundation_", as.integer(Sys.time()))
+      proxy |> addRasterImage(r, colors = colors_fn, opacity = 1, group = new_group, project = FALSE, options = gridOptions(pane = "inundation"))
+      last_group$name <- new_group
+      
+      # ensure legend removed (clearControls then re-add layers control)
+      proxy |> clearControls() |> add_layers_control()
+    }
+  })  
   # -------------------------
   # SHOW/HIDE VECTOR LAYERS
   # -------------------------
