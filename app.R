@@ -232,9 +232,9 @@ server <- function(input, output, session) {
       minv2 <- ifelse(is.na(minv) || minv <= 0, eps, minv)
       maxv2 <- ifelse(is.na(maxv) || maxv <= minv2, minv2 * 10, maxv)
       
-      # palette and color function: feed log10(x) into palette
-      pal_log <- viridisLite::viridis(256)
-      pal_fn <- colorNumeric(pal_log, domain = log10(c(minv2, maxv2)), na.color = NA)
+      # custom palette ramp 
+      pal_colors <- colorRampPalette(c("#224477", "#0088FF", "#99FFCC"))(256)
+      pal_fn <- colorNumeric(pal_colors, domain = log10(c(minv2, maxv2)), na.color = NA)
       
       colors_fn <- function(x) {
         # x may be matrix/array — apply vectorized
@@ -248,6 +248,7 @@ server <- function(input, output, session) {
         dim(cols) <- dim(x)
         cols
       }
+      
       
       # add raster with continuous colors
       new_group <- paste0("Inundation_all_", as.integer(Sys.time()))
