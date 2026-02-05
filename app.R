@@ -118,7 +118,7 @@ server <- function(input, output, session) {
   # -------------------------
   
   add_layers_control <- function(m) {
-    m |> addLayersControl(baseGroups=c("Imagery Only", "Imagery + Topo", "Topo Only"),
+    m |> addLayersControl(baseGroups=c("Imagery + Topo", "Imagery Only", "Topo Only"),
                           overlayGroups=c("Project Boundary","Creeks","Streamgages"),
                           options=layersControlOptions(collapsed=FALSE))
   }
