@@ -20,11 +20,11 @@ creeks_geo    <- "data/stream_lines.geojson"
 gages_geo     <- "data/stream_gages.geojson"
 
 # lake level attributes
-lake_level_meta <- tribble(~id    , ~name    , ~ft_navd88
-                         , "90EP" , "90% EP" , 1321.7
-                         , "50EP" , "Median" , 1324.4
-                         , "Full" , "Full"   , 1320.74 + 7.56
-                         ) 
+lake_level_meta <- tibble::tribble(~id    , ~name    , ~ft_navd88
+                                 , "90EP" , "90% EP" , 1321.7
+                                 , "50EP" , "Median" , 1324.4
+                                 , "Full" , "Full"   , 1320.74 + 7.56
+                                 ) 
 
 # -------- helpers --------
 open_cog <- function(alt, lake, return_path = TRUE) {
