@@ -168,7 +168,8 @@ server <- function(input, output, session) {
         providers$Esri.WorldTopo,
         group = "Imagery + Topo",
         options = providerTileOptions(pane = "basemap-overlay", opacity = 1.0, minZoom = 3, maxZoom = 18)
-      )|> add_layers_control()
+      ) |> 
+      add_layers_control()
     
     if (!is.null(boundary_sf)) m <- m |> addPolygons(data=boundary_sf, group="Project Boundary", fill=FALSE, color="#ffc600", weight=2, opacity=1, 
                                                      options=pathOptions(pane="polygons", dashArray = "5,5"))
@@ -271,9 +272,10 @@ server <- function(input, output, session) {
       proxy |> clearControls() |> add_layers_control() |>
         addLegend(
           position = "bottomright",
-          colors = pal_discrete,
-          labels = legend_labels,
-          title = "Flow"
+          colors = rev(pal_discrete),
+          labels = rev(legend_labels),
+          title = "Flow (cfs)",
+          opacity = 1
         )
       
       
