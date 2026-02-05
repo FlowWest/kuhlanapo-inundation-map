@@ -235,20 +235,28 @@ server <- function(input, output, session) {
       # custom palette ramp 
       pal_colors <- colorRampPalette(c("#224477", "#0088FF", "#99FFCC"))(256)
       pal_fn <- colorNumeric(pal_colors, domain = log10(c(minv2, maxv2)), na.color = NA)
+      n_colors <- length(flows)
+      
+      # create ramp
+      pal_discrete <- colorRampPalette(c("#224477", "#0088FF", "#99FFCC"))(n_colors)
+      legend_labels <- as.character(flows)
+      
+      # define breaks explicitly
+      breaks <- c(0, flows) 
       
       colors_fn <- function(x) {
-        # x may be matrix/array — apply vectorized
         xvec <- as.numeric(x)
-        xvec[is.na(xvec)] <- NA
-        xvec_pos <- pmax(xvec, eps)
-        cols <- rep(NA_character_, length(xvec_pos))
+        cols <- rep(NA_character_, length(xvec))
         valid <- !is.na(xvec)
-        cols[valid] <- pal_fn(log10(xvec_pos[valid]))
-        # return same shape as input
+        xvec_pos <- pmax(xvec[valid], eps)
+        
+        # numeric bin index
+        bins <- cut(xvec_pos, breaks = breaks, include.lowest = TRUE, labels = FALSE)
+        cols[valid] <- pal_discrete[bins]
+        
         dim(cols) <- dim(x)
         cols
       }
-      
       
       # add raster with continuous colors
       new_group <- paste0("Inundation_all_", as.integer(Sys.time()))
@@ -261,7 +269,13 @@ server <- function(input, output, session) {
       
       # re-add controls (clearControls removes all controls including layers control)
       proxy |> clearControls() |> add_layers_control() |>
-        addLegend(position = "bottomright", colors = leg_colors, labels = as.character(leg_vals), title = "Value (cfs)", opacity = 1)
+        addLegend(
+          position = "bottomright",
+          colors = pal_discrete,
+          labels = legend_labels,
+          title = "Flow"
+        )
+      
       
     } else {
       
