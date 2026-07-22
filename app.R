@@ -27,21 +27,34 @@ lake_level_meta <- tibble::tribble(~id    , ~name    , ~ft_navd88
                                  ) 
 
 # -------- helpers --------
+# check the file actually opens as a raster (guards against a cached
+# 404/error page from a bad download)
+is_valid_raster <- function(path) {
+  isTRUE(tryCatch({ rast(path); TRUE }, error = function(e) FALSE))
+}
+
 open_cog <- function(alt, lake, return_path = TRUE) {
   local_path <- here::here("data/cog", paste0("min_flow_inundation_", alt, "_lake_", lake, ".tif"))
-  
+
   if (file.exists(local_path)) {
     rast_path <- local_path
   } else {
     cog_url <- glue(COG_URL_TEMPLATE, alt = alt, lake = lake)
     cache_path <- file.path(local_cache_dir, basename(local_path))
-    
+
+    if (file.exists(cache_path) && !is_valid_raster(cache_path)) {
+      file.remove(cache_path)
+    }
     if (!file.exists(cache_path)) {
       download.file(cog_url, cache_path, mode = "wb")
+      if (!is_valid_raster(cache_path)) {
+        file.remove(cache_path)
+        stop("Downloaded file is not a valid raster: ", cog_url)
+      }
     }
     rast_path <- cache_path
   }
-  
+
   if (return_path) rast_path else rast(rast_path)
 }
 
@@ -51,7 +64,7 @@ if (!file.exists(plans_csv)) stop("plans-long.csv missing")
 plans_df <- read.csv(plans_csv, stringsAsFactors = FALSE)
 alternatives <- unique(plans_df$alternative)
 lake_levels <- unique(plans_df$lake_level)
-flows <- unique(plans_df$flow_cfs)
+flows <- sort(unique(plans_df$flow_cfs))
 
 # read vector layers if present (EPSG:4326)
 boundary_sf <- if (file.exists(boundary_geo)) st_read(boundary_geo, quiet = TRUE) else NULL

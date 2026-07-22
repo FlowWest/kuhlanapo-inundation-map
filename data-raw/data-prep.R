@@ -30,6 +30,10 @@ PLANS_CSV <- here("data", "plans-long.csv")
 OUT_COG_DIR <- here("data", "cog")
 dir.create(OUT_COG_DIR, recursive = TRUE, showWarnings = FALSE)
 
+# Intermediate per-flow raster cache directory
+RASTER_CACHE_DIR <- here("data-raw", "rasters")
+dir.create(RASTER_CACHE_DIR, recursive = TRUE, showWarnings = FALSE)
+
 # AOI shapefile (used for safe cropping/template alignment)
 AOI_SHP <- here("data-raw", "kuulanapo_bnd.shp.zip")
 if (!file.exists(PLANS_CSV)) stop("Missing plans-long.csv at: ", PLANS_CSV)
@@ -126,7 +130,7 @@ resolve_rast_path <- function(row) {
   if (!is.null(row$rast_path) && nzchar(row$rast_path) && file.exists(row$rast_path)) return(row$rast_path)
   if (!is.null(row$result_dts) && nzchar(row$result_dts)) {
     candidate <- file.path(RAS_RESULTS_DIR, row$plan_name, build_wse_name_from_dts(row$result_dts))
-    message("looking for", candidate)
+    message("looking for ", candidate)
     if (file.exists(candidate)) return(candidate)
   }
   #discovered <- find_wse_in_plan_folder(row$plan_name, row$flow_cfs)
@@ -151,9 +155,11 @@ read_prepare <- function(fp, template = NULL, filename = NULL) {
 }
 
 # ---------------- BUILD RAST PATHS ----------------
+# NOTE: keep the rast_path already loaded from plans-long.csv here (do not
+# blank it out) so resolve_rast_path()'s "explicit rast_path" precedence
+# actually has something to check.
 plans <- plans |>
-  mutate(rast_path = NA_character_,
-         rast_resolved = FALSE)
+  mutate(rast_resolved = FALSE)
 
 for (i in seq_len(nrow(plans))) {
   plans$rast_path[i] <- resolve_rast_path(plans[i, , drop = FALSE])
@@ -199,7 +205,7 @@ for (grp in groups) {
   for (j in seq_len(nrow(grp))) {
     fp <- grp$rast_path[j]
     fv <- grp$flow_cfs[j]
-    filename <- here("data-raw", "rasters", str_glue("wse_{alt}_{lake_level}_{fv}.tif"))
+    filename <- file.path(RASTER_CACHE_DIR, str_glue("wse_{alt}_{lake_level}_{fv}.tif"))
     message("  reading: ", fp, " (flow=", fv, ")")
     message(" to ", filename)
     rj <- tryCatch(read_prepare(fp, template = template, filename = filename),
